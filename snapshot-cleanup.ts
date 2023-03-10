@@ -42,7 +42,7 @@ exports.handler = async (event, context) => {
       throw new Error('Snapshot retention policy is not set to 21 days for all databases in the prod account.');
     }
     
-    // Get snapshots that are tagged with 'prod'
+    // Get snapshots that are not tagged with 'prod'
     const nonProdDBInstances = await rds.describeDBInstances({
       Filters: [{
         Name: 'tag:Environment',
@@ -50,7 +50,7 @@ exports.handler = async (event, context) => {
       }]
     }).promise();
 
-    // Set BackupRetentionPeriod to 0, effectively disabling snapshots for non-prod environments
+    // Set BackupRetentionPeriod to 0 for non-prod rds instances, effectively disabling snapshots
     for (const nonProdDBInstance of nonProdDBInstances.DBInstances) {
       await rds.modifyDBInstance({
         DBInstanceIdentifier: nonProdDBInstance.DBInstanceIdentifier,
